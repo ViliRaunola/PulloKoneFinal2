@@ -112,13 +112,14 @@ public class BottleDispenser {
 
     //KERRO RAHATILANNE
 
-        public void returnMoney() {
+        public double returnMoney() {
 
             if(money == 0) {
                 System.out.println("Klink klink!! All money gone!");
             }else {
                 System.out.println("Klink klink. Money came out!");
             }
+            return this.money;
         }
 
 

@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public Context context = null;
     public ArrayList<Bottle> ostetut = new ArrayList<Bottle>();
     private ArrayAdapter<Bottle> adapter;
+    private int onkoKuitattu = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,28 +82,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     public void valitse(View v){
-        if(kone.bottle_arraylist.size() != 0) {
-            int id, tarkistus = 0;
-            Bottle pullo = (Bottle) spinner.getSelectedItem();
-            id = pullotiedot(pullo);
-            for (int i = 0; i < kone.bottle_arraylist.size(); i++) {
-                if (kone.bottle_arraylist.get(i).getId() == id) {
-                    String temp;
-                    ostetut.add(kone.bottle_arraylist.get(i));
-                    temp = kone.buyBottle(i + 1);
-                    Toast.makeText(this, temp, LENGTH_SHORT).show();
-                    adapter.notifyDataSetChanged();
-                    tarkistus = 1;
-                    break;
+        if(kone.returnMoney() == 0){
+            Toast.makeText(this, "Add money first!", LENGTH_SHORT).show();
+        }else {
+            if (kone.bottle_arraylist.size() != 0) {
+                int id, tarkistus = 0;
+                Bottle pullo = (Bottle) spinner.getSelectedItem();
+                id = pullotiedot(pullo);
+                for (int i = 0; i < kone.bottle_arraylist.size(); i++) {
+                    if (kone.bottle_arraylist.get(i).getId() == id) {
+                        String temp;
+                        ostetut.add(kone.bottle_arraylist.get(i));
+                        temp = kone.buyBottle(i + 1);
+                        Toast.makeText(this, temp, LENGTH_SHORT).show();
+                        adapter.notifyDataSetChanged();
+                        tarkistus = 1;
+                        onkoKuitattu = 0;
+                        break;
+                    }
                 }
-            }
-            if (tarkistus == 0) {
+                if (tarkistus == 0) {
+                    Toast.makeText(this, "We have ran out of stock!", LENGTH_LONG).show();
+                    spinner.setAdapter(null);
+                }
+            } else {
                 Toast.makeText(this, "We have ran out of stock!", LENGTH_LONG).show();
                 spinner.setAdapter(null);
             }
-        }else{
-            Toast.makeText(this, "We have ran out of stock!", LENGTH_LONG).show();
-            spinner.setAdapter(null);
         }
     }
 
@@ -143,21 +149,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void writeFile(){
-        if(ostetut.size() != 0) {
-            String nimi = ostetut.get(ostetut.size() - 1).getName();
-            double hinta = ostetut.get(ostetut.size() - 1).getPrice();
-            String a = "Nimi, Hinta:\n" + nimi + " " + hinta + "€\n";
-            try {
-                OutputStreamWriter ows = new OutputStreamWriter(context.openFileOutput("kuitti.txt", Context.MODE_PRIVATE));
-                ows.write(a);
-                ows.close();
-                makeText(this, "You have received a receipt!", LENGTH_SHORT).show();
-                ostetut.clear();
-            } catch (IOException e) {
-                Log.e("IOExecption", "Virhe");
+        if(onkoKuitattu == 1){
+            makeText(this, "You already recieved the latest receipt", LENGTH_SHORT).show();
+        }else {
+            if (ostetut.size() != 0) {
+                String nimi = ostetut.get(ostetut.size() - 1).getName();
+                double hinta = ostetut.get(ostetut.size() - 1).getPrice();
+                String a = "Nimi, Hinta:\n" + nimi + " " + hinta + "€\n";
+                try {
+                    OutputStreamWriter ows = new OutputStreamWriter(context.openFileOutput("kuitti.txt", Context.MODE_PRIVATE));
+                    ows.write(a);
+                    ows.close();
+                    makeText(this, "You have received a receipt!", LENGTH_SHORT).show();
+                    ostetut.clear();
+                    onkoKuitattu = 1;
+                } catch (IOException e) {
+                    Log.e("IOExecption", "Virhe");
+                }
+            } else {
+                makeText(this, "You haven't bought anything", LENGTH_SHORT).show();
             }
-        }else{
-            makeText(this, "You haven't bought anything", LENGTH_SHORT).show();
         }
     }
 
