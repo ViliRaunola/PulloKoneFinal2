@@ -45,11 +45,12 @@ public class Bottle {
     public double getSize() {
         return size;
     }
-    @Override
-    public String toString(){
-        String temp2 = String.valueOf(size);
-        String temp = name + " " + temp2;
-        return temp;
+
+        @Override
+        public String toString(){
+            String temp2 = String.valueOf(size);
+            String temp = name + " " + temp2;
+            return temp;
     }
 
 }

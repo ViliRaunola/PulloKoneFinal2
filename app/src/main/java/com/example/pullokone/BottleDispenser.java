@@ -89,23 +89,22 @@ public class BottleDispenser {
 
     //OSTA PULLO
 
-        public String buyBottle(int x) {
-            int siirrin = x - 1;
-            double y = bottle_arraylist.get(siirrin).getPrice();
-            String temp = bottle_arraylist.get(siirrin).getName();
-            if(money > y) {
-                bottles -= 1;
-                money = money - y;
-                removeBottle(siirrin);
-                System.out.println("KACHUNK! " + temp + " came out of the dispenser!");
-                temp = "KACHUNK! " + temp + " came out of the dispenser!";
-                return temp;
-            }else {
-                System.out.println("Add money first!");
-                temp = "Add money first!";
-                return temp;
-            }
+    public String buyBottle(int x) {
+        int siirrin = x - 1;
+        double y = bottle_arraylist.get(siirrin).getPrice();
+        String temp = bottle_arraylist.get(siirrin).getName();
+        if(money >= y) {
+            bottles -= 1;
+            money = money - y;
+            removeBottle(siirrin);
+            //System.out.println("KACHUNK! " + temp + " came out of the dispenser!");
+            temp = "You bought! " + temp + " !";
+        }else {
+            temp = "Add money first!";
+            //System.out.println(temp);
         }
+        return temp;
+    }
 
 
 
@@ -154,7 +153,7 @@ public class BottleDispenser {
 
         public double getMoney() {
             double temp;
-            System.out.printf("Klink klink. Money came out! You got %.2f€ back\n", money);
+            //System.out.printf("Klink klink. Money came out! You got %.2f€ back\n", money);
             temp = money;
             money = 0.0;
             return temp;

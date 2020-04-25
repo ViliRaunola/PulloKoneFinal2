@@ -22,6 +22,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 import static android.widget.Toast.*;
+import static com.example.pullokone.R.id.spinner;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private SeekBar seekBar;
     public Context context = null;
     public ArrayList<Bottle> ostetut = new ArrayList<Bottle>();
+    private ArrayAdapter<Bottle> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,11 +70,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         spinner = findViewById(R.id.spinner);
 
-        ArrayAdapter<Bottle> adapter = new ArrayAdapter<Bottle>(this,
+
+        adapter = new ArrayAdapter<Bottle>(this,
                 android.R.layout.simple_spinner_item, kone.bottle_arraylist);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
     }
+
+
+
 
     public void valitse(View v){
         if(kone.bottle_arraylist.size() != 0) {
@@ -84,24 +90,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     String temp;
                     ostetut.add(kone.bottle_arraylist.get(i));
                     temp = kone.buyBottle(i + 1);
-                    Toast.makeText(this, temp, LENGTH_LONG).show();
+                    Toast.makeText(this, temp, LENGTH_SHORT).show();
+                    adapter.notifyDataSetChanged();
                     tarkistus = 1;
                     break;
                 }
             }
             if (tarkistus == 0) {
                 Toast.makeText(this, "We have ran out of stock!", LENGTH_LONG).show();
+                spinner.setAdapter(null);
             }
         }else{
             Toast.makeText(this, "We have ran out of stock!", LENGTH_LONG).show();
+            spinner.setAdapter(null);
         }
     }
+
+
 
     public int pullotiedot(Bottle pullo){
         String name = pullo.getName();
         int id = pullo.getId();
         double size  = pullo.getSize();
-        Toast.makeText(this, "You bought bottle " + name + " " + size, LENGTH_LONG).show();
+        //Toast.makeText(this, "You bought bottle " + name + " " + size, LENGTH_LONG).show();
         return id;
     }
 
@@ -119,7 +130,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.palautarahat:
                 temp = kone.getMoney();
-                makeText(this, "Klink klink. Money came out! You got " + temp + "€ back.", LENGTH_SHORT).show();
+                if(temp > 0) {
+                    makeText(this, "Klink klink. Money came out! You got " + temp + "€ back.", LENGTH_SHORT).show();
+                }else{
+                    makeText(this, "There isn't any money in the machine", LENGTH_SHORT).show();
+                }
                 break;
             case R.id.kuitti:
                 writeFile();
@@ -137,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 ows.write(a);
                 ows.close();
                 makeText(this, "You have received a receipt!", LENGTH_SHORT).show();
+                ostetut.clear();
             } catch (IOException e) {
                 Log.e("IOExecption", "Virhe");
             }
